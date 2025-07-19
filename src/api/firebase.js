@@ -7,52 +7,37 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 
+// Firebase 설정 - 실제 프로젝트 정보로 교체해야 합니다
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'demo-api-key',
-  authDomain:
-    import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'demo-project.firebaseapp.com',
-  databaseURL:
-    import.meta.env.VITE_FIREBASE_DB_URL ||
-    'https://demo-project-default-rtdb.firebaseio.com',
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'demo-project',
-  storageBucket:
-    import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'demo-project.appspot.com',
-  messagingSenderId:
-    import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '123456789',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || 'demo-app-id',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DB_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  // messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  // appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
+console.log("API KEY:", import.meta.env.VITE_FIREBASE_API_KEY);
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const auth = getAuth();
 const provider = new GoogleAuthProvider();
 
 export async function login() {
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    console.log(user);
-    return user;
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error;
-  }
+  return signInWithPopup(auth, provider)
+    .then((result) => {
+      const user = result.user;
+      console.log(user);
+      return user;
+    })
+    .catch(console.error);
 }
 
 export async function logout() {
-  try {
-    await signOut(auth);
-    return null;
-  } catch (error) {
-    console.error('Logout error:', error);
-    throw error;
-  }
+  return signOut(auth).then(() => null);
 }
 
 export function onUserStateChange(callback) {
-  return onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, (user) => {
     callback(user);
   });
 }
-
-export { auth, app };
